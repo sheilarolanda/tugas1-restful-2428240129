@@ -1,0 +1,12 @@
+{
+  "name": "tugas1-restful-2428240129",
+  "version": "1.0.0",
+  "description": "RESTful API Resep Masakan",
+  "main": "api/index.js",
+  "scripts": {
+    "start": "node api/index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
