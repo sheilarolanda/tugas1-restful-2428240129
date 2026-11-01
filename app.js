@@ -4,6 +4,21 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
+// Middleware Pengecekan API Key (Menolak request jika x-api-key tidak sesuai)
+const cekApiKey = (req, res, next) => {
+  const apiKey = req.headers['x-api-key'];
+  const validApiKey = process.env.API_KEY || 'kunci_rahasia_paw2'; // Sesuaikan dengan variabel environment kamu
+
+  if (!apiKey || apiKey !== validApiKey) {
+    return res.status(401).json({
+      status: "error",
+      message: "Akses ditolak. Kunci API tidak valid atau tidak ditemukan.",
+      data: null
+    });
+  }
+  next();
+};
+
 // Data Awal Resep Masakan
 let recipes = [
   {
@@ -74,7 +89,8 @@ app.get('/recipes/:id', (req, res) => {
   res.status(200).json(recipe);
 });
 
-app.post('/recipes', (req, res) => {
+// Dipasangkan cekApiKey sebelum handler POST
+app.post('/recipes', cekApiKey, (req, res) => {
   const { namaResep, asalDaerah, bahan, waktuMasakMenit, tingkatKesulitan } = req.body;
   if (!namaResep || !bahan || !waktuMasakMenit || !tingkatKesulitan) {
     return res.status(400).json({
@@ -99,7 +115,8 @@ app.post('/recipes', (req, res) => {
   });
 });
 
-app.put('/recipes/:id', (req, res) => {
+// Dipasangkan cekApiKey sebelum handler PUT
+app.put('/recipes/:id', cekApiKey, (req, res) => {
   const id = parseInt(req.params.id);
   const recipeIndex = recipes.findIndex((r) => r.id === id);
   if (recipeIndex === -1) {
@@ -132,7 +149,8 @@ app.put('/recipes/:id', (req, res) => {
   });
 });
 
-app.delete('/recipes/:id', (req, res) => {
+// Dipasangkan cekApiKey sebelum handler DELETE
+app.delete('/recipes/:id', cekApiKey, (req, res) => {
   const id = parseInt(req.params.id);
   const recipeIndex = recipes.findIndex((r) => r.id === id);
   if (recipeIndex === -1) {
@@ -157,4 +175,4 @@ if (process.env.NODE_ENV !== 'production') {
   });
 }
 
-module.exports = app; 
+module.exports = app;
